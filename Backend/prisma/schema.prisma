@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role
+  employee  Employee?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Employee {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  department    String
+  designation   String
+  dateOfJoining DateTime
+  contectNo     String
+  address       String?
+  status        EmployeeStatus
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  leave         Leave[]
+  attendance    Attendance[]
+}
+
+model Attendance {
+  id         String   @id @default(uuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  date      DateTime         @default(now())
+  checkIn   DateTime?
+  checkOut  DateTime?
+  status    AttendanceStatus
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@unique([employeeId, date])
+}
+
+model Leave {
+  id         String      @id @default(uuid())
+  employeeId String
+  employee   Employee    @relation(fields: [employeeId], references: [id])
+  leaveType  LeaveType
+  startDate  DateTime
+  endDate    DateTime
+  reason     String?
+  status     LeaveStatus @default(PENDING)
+  approvedBy String?
+  createdAt  DateTime    @default(now())
+  updateAt   DateTime    @updatedAt
+}
+
+enum Role {
+  USER
+  Employee
+  ADMIN
+}
+
+enum EmployeeStatus {
+  Active
+  Inactive
+}
+
+enum AttendanceStatus {
+  Present
+  Absent
+  HalfDay
+}
+
+enum LeaveType {
+  SickLeave
+  PaidLeave
+  CasualLeave
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
