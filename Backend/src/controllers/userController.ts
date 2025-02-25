@@ -9,7 +9,7 @@ import {
     updateProfileSchema,
 } from "../validations/inputValidations";
 
-export const registerUser = async (req: any, res: any) => {
+export const craeteUser = async (req: any, res: any) => {
     let { email, password, name } = req.body;
     const { success } = signUpSchema.safeParse(req.body);
     if (!success) {
@@ -111,12 +111,17 @@ export const getUserProfile = async (req: any, res: any) => {
 };
 
 export const updateUserProfile = async (req: any, res: any) => {
-    const { name, password, email } = req.body;
+    let { name, password, email } = req.body;
 
     const { success } = updateProfileSchema.safeParse(req.body);
 
     if (!success) {
         return res.status(400).json({ message: "Invalid data" });
+    }
+
+    if (password) {
+        const hash = await bcrypt.hash(password, 10);
+        password = hash;
     }
 
     const user = await prisma.user.update({
@@ -140,9 +145,10 @@ export const updateUserProfile = async (req: any, res: any) => {
 };
 
 export const deleteUserProfile = async (req: any, res: any) => {
+    const { id } = req.body;
     const admin = await prisma.user.findUnique({
         where: {
-            id: req.id,
+            id:id,
         },
     });
 
@@ -178,27 +184,71 @@ export const deleteUserProfile = async (req: any, res: any) => {
     });
 };
 
+export const getUsers = async (req: any, res: any) => {
 
-
-
-export const getUsers = async (req:any, res:any ) => {
-
-    const userId = req.id;
-  
-    const user = await prisma.user.findUnique({
-      where: {
-        id : userId
-      }
+    const employees = await prisma.user.findMany({
+        where :{
+            OR : [
+                {
+                    role : "EMPLOYEE"
+                },
+                {
+                    role : "HR"
+                },
+                {
+                    role : "GUIDE"
+                }
+            ],
+            NOT:[{
+                id : req.id
+            }]
+        },
     });
-  
-    if(!user) {
-      return res.status(404).json({
-        message: "User not found"
-      })
-    }
-    const employees = await prisma.user.findMany();
-  
+
     return res.status(200).json({
-      employees
+        employees,
+    });
+};
+
+
+
+export const getUserUsersProfile = async(req:any, res:any) => {
+    const userId = req.params.id;
+
+    const user = await prisma.user.findUnique({
+        where:{
+            id: userId
+        }
+    });
+
+    if(!user){
+        return res.status(404).json({message: "User not found"});
+    }
+
+    res.json({
+        data: user
+    });
+}
+
+
+export const updateUserRole = async(req:any, res:any) => {
+    const {id , role } = req.body;
+
+    const user = await prisma.user.update({
+        where:{
+            id: id
+        },
+        data:{
+            role: role
+        }
     })
-  }
+
+    if(!user){
+        return res.status(404).json({message: "User not found"});
+    }
+
+    res.json({
+        data: user
+    });
+}
+

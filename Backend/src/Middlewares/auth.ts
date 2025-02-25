@@ -20,3 +20,19 @@ export const authMiddleware = async (req: any, res: any, next: any) => {
         });
     }
 };
+
+export const verifyRole =
+    (Role: [string?, string?, string?, string?]) =>
+    (req: any, res: any, next: any) => {
+        if (!req.id) {
+            return res.status(401).json({
+                message: "Unauthorized",
+            });
+        }
+        if (!Role.includes(req.role)) {
+            return res.status(401).json({
+                message: "Unauthorized",
+            });
+        }
+        next();
+    };

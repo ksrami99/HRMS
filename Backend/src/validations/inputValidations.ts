@@ -18,4 +18,23 @@ export const updateProfileSchema = zod.object({
 });
 
 
+export const registerEmployeeSchema = zod.object({
+  userId : zod.string(),
+  department : zod.string(),
+  designation: zod.string(),
+  dateOfJoining: zod.DateTime(),
+  contectNo: zod.string(),
+  address: zod.string(),
+}) 
+
+export const updateEmployeeSchema = zod.object({
+  userId : zod.string().optional(),
+  department : zod.string().optional(),
+  designation: zod.string().optional(),
+  dateOfJoining: zod.DateTime().optional(),
+  contectNo: zod.string().optional(),
+  address: zod.string().optional(),
+}) 
+
+
 export const deleteProfuleSchema = zod.string();
