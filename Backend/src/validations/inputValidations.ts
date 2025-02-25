@@ -37,4 +37,4 @@ export const updateEmployeeSchema = zod.object({
 }) 
 
 
-export const deleteProfuleSchema = zod.string();
+export const idSchema = zod.string();

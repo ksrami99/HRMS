@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import {
-    deleteProfuleSchema,
+    idSchema,
     loginSchema,
     signUpSchema,
     updateProfileSchema,
@@ -162,7 +162,7 @@ export const deleteUserProfile = async (req: any, res: any) => {
             .json({ message: "Only tha admin can delete the user" });
     }
 
-    const { success } = deleteProfuleSchema.safeParse(req.params.id);
+    const { success } = idSchema.safeParse(req.params.id);
 
     if (!success) {
         return res.status(400).json({ message: "Invalid data" });

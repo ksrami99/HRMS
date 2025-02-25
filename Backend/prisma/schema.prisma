@@ -18,7 +18,7 @@ model User {
   name      String
   email     String    @unique
   password  String
-  role      Role     @default(EMPLOYEE)
+  role      Role      @default(EMPLOYEE)
   employee  Employee?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -35,8 +35,8 @@ model Employee {
   dateOfJoining DateTime
   contectNo     String
   address       String?
-  createdAt     DateTime       @default(now())  
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   leave         Leave[]
   attendance    Attendance[]
 }
@@ -46,14 +46,8 @@ model Attendance {
   employeeId String
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  date      DateTime         @default(now())
-  checkIn   DateTime?
-  checkOut  DateTime?
-  status    AttendanceStatus 
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-
-  @@unique([employeeId, date])
+  checkIn  DateTime @default(now())
+  checkOut DateTime @updatedAt
 }
 
 model Leave {
@@ -75,13 +69,6 @@ enum Role {
   ADMIN
   EMPLOYEE
   GUIDE
-}
-
-
-enum AttendanceStatus {
-  Present
-  Absent
-  HalfDay
 }
 
 enum LeaveType {
